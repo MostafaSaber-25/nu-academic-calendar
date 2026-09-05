@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Calendar, X, ChevronRight, GraduationCap, Coffee, FileText, AlertCircle, Sun, Moon, Upload, Settings, Check, AlertTriangle } from 'lucide-react';
+import { Search, Calendar, X, ChevronRight, GraduationCap, Sun, Moon, Upload, Settings, Check, AlertTriangle } from 'lucide-react';
 
 interface CalendarEvent {
   id: number;
@@ -35,13 +35,7 @@ const initialCalendarData: CalendarEvent[] = [
   { id: 23, date: "Jan 25", title: "Police Day Holiday", type: "holiday" }
 ];
 
-const typeIcons = {
-  academic: GraduationCap,
-  holiday: Coffee,
-  exam: AlertCircle,
-  deadline: FileText,
-  registration: Calendar
-};
+
 
 const typeColors = {
   academic: { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200', darkBg: 'bg-blue-900/20', darkText: 'text-blue-300', darkBorder: 'border-blue-800' },
@@ -427,9 +421,7 @@ function App() {
           <div className="space-y-6 pl-10">
             <AnimatePresence mode="popLayout">
               {filteredData.map((event, index) => {
-                const Icon = typeIcons[event.type];
                 const colors = typeColors[event.type];
-                const isDark = isDarkMode;
                 
                 return (
                   <motion.div
@@ -442,39 +434,39 @@ function App() {
                   >
                     {/* Dot */}
                     <div className={`absolute -left-7 top-6 w-3 h-3 rounded-full border-2 transition-colors ${
-                      isDark 
+                      isDarkMode 
                         ? 'bg-slate-900 border-slate-600 group-hover:border-blue-400' 
                         : 'bg-white border-slate-300 group-hover:border-blue-900'
                     }`} />
                     
                     {/* Event Card */}
                     <div className={`p-5 rounded-sm border transition-all duration-200 ${
-                      isDark 
+                      isDarkMode 
                         ? 'bg-slate-800 border-slate-700 shadow-md hover:border-slate-600' 
                         : 'bg-white border-slate-200 shadow-sm hover:border-slate-300'
                     }`}>
                       <div className="flex items-start gap-4">
                         <div className="w-16 flex-shrink-0">
-                          <p className={`text-lg font-semibold font-sans ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>
+                          <p className={`text-lg font-semibold font-sans ${isDarkMode ? 'text-slate-200' : 'text-slate-900'}`}>
                             {event.date}
                           </p>
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-2">
                             <span className={`px-2 py-0.5 rounded-sm text-xs font-medium border ${
-                              isDark 
+                              isDarkMode 
                                 ? `${colors.darkBg} ${colors.darkText} ${colors.darkBorder}`
                                 : `${colors.bg} ${colors.text} ${colors.border}`
                             }`}>
                               {categoryLabels[event.type]}
                             </span>
                           </div>
-                          <h3 className={`text-base font-medium font-sans ${isDark ? 'text-slate-300' : 'text-slate-800'}`}>
+                          <h3 className={`text-base font-medium font-sans ${isDarkMode ? 'text-slate-300' : 'text-slate-800'}`}>
                             {event.title}
                           </h3>
                         </div>
                         <div className="w-8 flex-shrink-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                          <ChevronRight className={`w-4 h-4 ${isDark ? 'text-slate-500' : 'text-slate-400'}`} />
+                          <ChevronRight className={`w-4 h-4 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`} />
                         </div>
                       </div>
                     </div>
@@ -552,7 +544,6 @@ function App() {
                   {searchQuery.trim() ? (
                     filteredData.length > 0 ? (
                       filteredData.map((event, index) => {
-                        const Icon = typeIcons[event.type];
                         const colors = typeColors[event.type];
                         return (
                           <motion.button
@@ -574,7 +565,7 @@ function App() {
                             <div className={`w-8 h-8 rounded-sm flex items-center justify-center flex-shrink-0 ${
                               isDarkMode ? 'bg-slate-700' : 'bg-slate-50'
                             }`}>
-                              <Icon className={`w-4 h-4 ${isDarkMode ? 'text-slate-400' : 'text-slate-400'}`} />
+                              <Search className={`w-4 h-4 ${isDarkMode ? 'text-slate-400' : 'text-slate-400'}`} />
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className={`text-sm font-medium ${isDarkMode ? 'text-slate-200' : 'text-slate-900'}`}>
@@ -585,7 +576,7 @@ function App() {
                               </p>
                             </div>
                             <span className={`px-2 py-0.5 rounded-sm text-xs font-medium border ${
-                              isDark 
+                              isDarkMode 
                                 ? `${colors.darkBg} ${colors.darkText} ${colors.darkBorder}`
                                 : `${colors.bg} ${colors.text} ${colors.border}`
                             }`}>
