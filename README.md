@@ -1,4 +1,4 @@
-# NU Academic Calendar 2026-2027
+# NU Academic Calendar
 
 **Live Demo:** [View Academic Calendar](https://nu-academic-calendar-alpha.vercel.app/)
 
