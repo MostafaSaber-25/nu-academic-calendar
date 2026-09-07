@@ -80,6 +80,82 @@ function getDaysUntil(eventDate: Date): number {
   return Math.ceil(diff / (1000 * 60 * 60 * 24));
 }
 
+function generateGoogleCalendarUrl(event: CalendarEvent): string {
+  const monthMap: { [key: string]: number } = {
+    'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
+    'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
+  };
+
+  const parseDate = (dateStr: string | undefined | null): Date | null => {
+    if (!dateStr || typeof dateStr !== 'string') {
+      return null;
+    }
+
+    const trimmedStr = dateStr.trim();
+    if (!trimmedStr) {
+      return null;
+    }
+
+    const parts = trimmedStr.split(' ');
+    if (parts.length < 2) {
+      return null;
+    }
+
+    const month = monthMap[parts[0]];
+    if (month === undefined) {
+      return null;
+    }
+
+    const dayStr = parts[1]?.replace('-', '');
+    const day = parseInt(dayStr);
+    if (isNaN(day) || day < 1 || day > 31) {
+      return null;
+    }
+
+    return new Date(2026, month, day);
+  };
+
+  const formatDate = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}${month}${day}`;
+  };
+
+  // Validate event date
+  if (!event.date || typeof event.date !== 'string') {
+    return 'https://calendar.google.com/calendar/render?action=TEMPLATE';
+  }
+
+  let startDate: Date | null;
+  let endDate: Date | null;
+
+  if (event.date.includes('-')) {
+    const dateRange = event.date.split('-');
+    startDate = parseDate(dateRange[0]);
+    endDate = parseDate(dateRange[1]);
+  } else {
+    startDate = parseDate(event.date);
+    if (startDate) {
+      endDate = new Date(startDate);
+      endDate.setDate(endDate.getDate() + 1);
+    } else {
+      endDate = null;
+    }
+  }
+
+  // If parsing failed, return a safe fallback URL
+  if (!startDate || !endDate) {
+    const encodedTitle = encodeURIComponent(event.title || 'Event');
+    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodedTitle}`;
+  }
+
+  const dates = `${formatDate(startDate)}/${formatDate(endDate)}`;
+  const encodedTitle = encodeURIComponent(event.title || 'Event');
+  
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodedTitle}&dates=${dates}`;
+}
+
 function ProfileBadge({ isDarkMode }: { isDarkMode: boolean }) {
   return (
     <div className="flex items-center justify-center p-4">
@@ -465,8 +541,30 @@ function App() {
                             {event.title}
                           </h3>
                         </div>
-                        <div className="w-8 flex-shrink-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                          <ChevronRight className={`w-4 h-4 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`} />
+                        <div className="flex items-center gap-2">
+                          <a
+                            href={generateGoogleCalendarUrl(event)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`p-2 rounded-lg transition-all duration-200 ${
+                              isDarkMode 
+                                ? 'hover:bg-slate-700 text-slate-400 hover:text-blue-400' 
+                                : 'hover:bg-slate-100 text-slate-400 hover:text-blue-600'
+                            }`}
+                            title="Add to Google Calendar"
+                          >
+                            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                              <line x1="16" y1="2" x2="16" y2="6"/>
+                              <line x1="8" y1="2" x2="8" y2="6"/>
+                              <line x1="3" y1="10" x2="21" y2="10"/>
+                              <line x1="12" y1="15" x2="12" y2="19"/>
+                              <line x1="10" y1="17" x2="14" y2="17"/>
+                            </svg>
+                          </a>
+                          <div className="w-8 flex-shrink-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <ChevronRight className={`w-4 h-4 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`} />
+                          </div>
                         </div>
                       </div>
                     </div>
